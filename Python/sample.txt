@@ -1,0 +1,111 @@
+import urllib
+import json
+import random
+import math
+import sys
+from random import randint,uniform
+from datetime import datetime
+
+'''Pressure drop with increase in altitude is not uniform. Pressure drop takes place @
+   about 90 mb(mili bar) per km rise in altitude up to a distance of 5.5 km.That is
+   about 50% drop in air pressure takes place at an altitude of 5.5 km up in the troposphere.
+   Beyond 5.5 Km rate of pressure drop slows down and it is about @ 20 mb/km upto a height of 30 km.
+   There after rate of pressure drop further slows downAssuming at sea level pressure is 1013.25 '''
+   
+def get_pressure(elevation):
+    if (elevation<=6000):
+        pressure =1013.25-(elevation/1000)*90
+        return pressure
+    else:
+        pressure =1013.25-(6000/1000)*90+(elevation-6000/1000)*20
+        return pressure
+
+def get_humidity():
+    humidity=randint(0,120)
+    return humidity
+
+''' The temperature in the troposphere usually decreases with
+    height at the average lapse rate of 6.5 °C per kilometer.
+    The air in the troposphere is more unstable and with strong convection.'''
+
+def get_temperature(elevation):
+    temp = 50-int((elevation/1000)*6.5)
+    temperature = randint(0,temp) -40 + 15 
+    return temperature
+
+def get_localtime():
+	year = randint(2015, 2016)
+	month = randint(1, 12)
+	day = randint(1, 28)
+	hr = randint(0, 23)
+	mi = randint(0, 59)
+	ss = randint(0, 59)
+	local_time = datetime(year, month, day, hr, mi, ss)
+	return local_time
+
+def get_elevation(xLat, yLong, sensor=False):
+    ELEVATION_BASE_URL = 'http://maps.google.com/maps/api/elevation/json'
+    URL_PARAMS = "locations=%.7f,%.7f&sensor=%s" % (xLat,yLong, "false")
+    url = ELEVATION_BASE_URL + "?" + URL_PARAMS
+    response = urllib2.urlopen(url)
+    jsondata = response.read().decode()
+    data = json.loads(jsondata)
+    status = data['status']
+    if status == 'OK':
+        result = data['results'][0]
+        elevation = float(result['elevation'])
+    else:
+        elevation=None    
+    return elevation
+
+def get_climate(humidity,temperature):
+	if temperature>0 and humidity>95:
+		return 'Rain'	
+	elif temperature>0 and humidity<95:
+		return 'Sunny'
+	elif temperature<0 and humidity<95:
+		return 'Snow'
+	elif temperature<0 and humidity>95:
+		return 'Snow'
+	elif temperature==0 and humidity<95:
+		return 'Sunny'
+	elif temperature==0 and humidity>95:
+		return 'Rain'
+
+'''Generate random latitude and Longitude based on the a given location under a certain radius  in meters 
+   point  can be  choosen as  a centre  of  any continent location to avoid sea area  and claculate the radious in degrees'''
+
+def generate_data(lat,lon,num_rows,radius):
+    radiusInDegrees=radius/111300
+    r = radiusInDegrees
+    x0 = lat
+    y0 = lon
+    
+    for i in range(1,num_rows):
+        u = float(random.uniform(0.0,1.0))
+        v = float(random.uniform(0.0,1.0))
+        w = r * math.sqrt(u)
+        t = 2 * math.pi * v
+        x = w * math.cos(t)
+        y = w * math.sin(t)
+   
+        xLat  = x + x0
+        yLong = y + y0
+   
+        #elevation = get_elevation(xLat,yLong)
+        elevation=0
+        pressure = get_pressure(elevation)
+        temperature =get_temperature(elevation)
+        humidity =get_humidity()
+        local_time = get_localtime()
+        climate = get_climate(humidity,temperature)
+ 
+        
+        print(str(+xLat)+str('|')+str(yLong)+str('|')+str(pressure)+str('|')+str(temperature)+str('|')+str(humidity)+str('|')+str(local_time)+str('|')+climate)
+
+
+if __name__ == "__main__":
+
+    result_records=10
+    radius=500000
+    generate_data(-37.83, 144.98,result_records,radius)
