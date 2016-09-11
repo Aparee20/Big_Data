@@ -1,1 +1,162 @@
-—
+—Hive
+
+Login to hive :
+
+Hive
+
+Check all the databases
+
+Show databases;
+
+-xxxx sample database  using directory structure
+
+hadoop fs -ls /user/hive/warehouse
+Found 5 items
+drwxrwxrwx   - hive     hive          0 2016-02-18 18:31 /user/hive/warehouse/departments
+drwxrwxrwx   - hive     hive          0 2016-02-18 18:24 /user/hive/warehouse/departments_test
+drwxrwxrwx   - cloudera hive          0 2016-03-09 06:11 /user/hive/warehouse/financials.db
+drwxrwxrwx   - cloudera hive          0 2016-03-09 08:13 /user/hive/warehouse/mydb.db
+drwxrwxrwx   - hive     hive          0 2016-02-08 06:17 /user/hive/warehouse/sqoop_import.db
+
+
+Create database if not Exists;
+
+CREATE DATABASE IF NOT EXISTS cards;
+CREATE DATABASE IF NOT EXISTS retail_ods;
+CREATE DATABASE retail_edw;
+CREATE DATABASE retail_stage;
+
+
+
+
+Query to check table:
+
+Show Tables;
+
+
+How to describe a tables
+
+describe formatted table_name 
+describe extended table_name
+
+Query to get first 100 rows of table
+
+select * from departments limit 100;
+
+Login to my-sql db from hive
+
+mysql -u root -p
+On prompt :cloudera
+
+Show databases;
+
+Use retail_db
+
+Show tables
+
+
+Load data from hive to unix files
+
+select * from categories into outfile '/tmp/categories01.psv' fields terminated by '|' lines terminated by '\n';
+
+
+Load data from local file system to hive table
+
+load data local inpath '/tmp/categories01.psv' overwrite into table categories;
+
+
+Load data from hdfs to hive
+
+#Prepare HDFS stage directory
+#On command prompt (if you login as root)
+hadoop fs -mkdir /user/root/categories
+hadoop fs -put /tmp/categories01.psv /user/root/categories
+hadoop fs -ls /user/root/categories
+
+#Launch hive
+hive
+use retail_ods;
+load data inpath '/user/root/departments/*' overwrite into table categories;
+hadoop fs -ls /user/root/categories
+
+
+
+Query to insert data
+
+
+
+
+
+
+
+
+External and Non External tables
+Hive supports two main kinds of tables: external and non external. With external tables, the data is added to the table by using a load partition command. For non external tables, the data goes in whichever folder you specified in LOCATION block of the create statement. If no LOCATION is specified, hive will use its default base location specified in its configuration variable named ” hive.metastore.warehouse.dir”.  When you drop an external table, the data is not deleted. But, when you drop a non external table, the data is deleted along with the table. You can think of the data in Hive tables like giant CSV’s with some pre-determined delimiter defined when creating the table
+
+
+Partitions in HIve
+Partition columns are virtual columns, they are not part of the data itself but are derived on load. Partitions columns don’t have to be dates, but many times, at least one of the columns tends to be a date type.
+
+Example:create a partitioned external table where rows are delimited by comma:
+
+CREATE EXTERNAL TABLE IF NOT EXISTS access_log (log_line STRING)
+PARTITIONED BY (hive_entry_timestamp STRING)
+ROW FORMAT DELIMITED
+   FIELDS TERMINATED BY ','
+FIELDS TERMINATED BY '01'
+STORED AS TEXTFILE
+LOCATION '/user/demo/access_logs';
+
+How to add Partitions in HIve:
+
+ALTER TABLE access_log
+  DROP IF EXISTS PARTITION (hive_entry_timestamp='2014-07-04T00:00Z');
+
+ALTER TABLE access_log
+  ADD PARTITION (hive_entry_timestamp='2014-07-04T00:00Z')
+  LOCATION '/user/demo/access_logs/2014/07/04/00/00';
+
+
+
+
+
+
+
+
+Alter table in HIVE
+
+ALTER TABLE name RENAME TO new_name
+ALTER TABLE name ADD COLUMNS (col_spec[, col_spec ...])
+ALTER TABLE name DROP [COLUMN] column_name
+ALTER TABLE name CHANGE column_name new_name new_type
+ALTER TABLE name REPLACE COLUMNS (col_spec[, col_spec ...])  
+
+
+Hints in hive query
+/* streamtable(table_name) */
+Streaming a table of small size makes the query faster.
+
+The clause " WITH DEFERRED REBUILD" while creating an index
+It is about creating index on an empty table.
+
+
+
+
+Query to do left outer join
+
+
+Query to do right outer join
+
+
+Query to do full outer join
+
+
+
+
+
+Query to update data
+
+
+
+Query to delete data
+
