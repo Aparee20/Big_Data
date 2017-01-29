@@ -1,0 +1,25 @@
+Create table Employee_details
+( id int
+,name string
+,team_members array<string>
+,Phone Map<string,bigint>
+,Other_contact_details struct<skype_id:string ,mail_id:string ,home_landline:bigint>
+) row format delimited 
+fields terminated by '\t'
+collection items terminated by ','
+map keys terminated by ':'
+lines terminated by '\n'
+stored as textfile;
+
+
+
+Load data local inpath ‘/home/cloudera/Desktop/employee_details_data.txt’  into table  employee_details;
+
+
+
+101	Sam	jack,vien,John	personal:98653423451,official:987675436	xyz20,xyz@gmail.com,897546479262
+102	Van	son,ram,John	personal:7676545435,official:9876765432	vananakk23,vananakk23@gmail.com,27346723647
+103	Rose	rick,rob	personal:7656543245,official:0987565432	rosexyz,rosexyz@gmail.com,12745781254
+104	Mac	bob,vien,camerel,gold	personal:6754354672,official:84635342624	macxyz,macxyz@gmail.com,1247851247
+105	Steve	tom,mark,rock	personal:74645242322,official:6454526262	stevexyz,stevexyz@gmail.com,129487128461
+
