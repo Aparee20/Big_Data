@@ -1,0 +1,8 @@
+writting a comma seperated text file without databricks package.
+
+-----XXXXXXXXXXX
+
+text=data.rdd
+text.map(lambda x: ",".join(map(str,x))).saveAsTextFile('/Users/ankurpareek/Desktop/tests/main.txt')
+
+-----XXXXXXXXXXX
