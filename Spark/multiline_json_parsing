@@ -1,0 +1,19 @@
+import sys
+from pyspark import SparkContext
+from pyspark import SparkConf
+from pyspark.sql import SQLContext, Row
+from pyspark.sql.types import *
+import json
+
+sc = SparkContext()
+sqlContext = SQLContext(sc)
+
+
+
+jsonRDD = sc.wholeTextFiles("multiline.json").map(lambda x : x[1]).map(lambda x : re.sub(r"\s+", "", x,flags=re.UNICODE))
+
+type(jsonRDD)
+
+json_df=sqlContext.jsonRDD(jsonRDD)
+
+json_df.registerTempTable("tbl")
