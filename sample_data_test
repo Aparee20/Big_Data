@@ -1,0 +1,16 @@
+emp_id,first_name,last_name,salary,dept_id
+1,Honey,Patel,10100,1
+2,Shweta,Jariwala,19300,2
+3,Vinay,Jariwala,35100,3
+4,Jagruti,Viras,9500,2
+5,Shweta,Rana,12000,3
+6,Sonal,Menpara,13000,1
+7,Yamini,Patel,10000,2
+8,Khyati,Shah,50000,3
+9,Shwets,Jariwala,19400,2
+
+
+dept_id,dept_name
+1,Medical
+2,Engineering
+3,Mechanical
